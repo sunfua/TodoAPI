@@ -1,0 +1,8 @@
+D:\VScode\TodoAPI\bin\Release\netcoreapp1.1\TodoAPI.deps.json
+D:\VScode\TodoAPI\bin\Release\netcoreapp1.1\TodoAPI.runtimeconfig.json
+D:\VScode\TodoAPI\bin\Release\netcoreapp1.1\TodoAPI.runtimeconfig.dev.json
+D:\VScode\TodoAPI\bin\Release\netcoreapp1.1\TodoAPI.dll
+D:\VScode\TodoAPI\bin\Release\netcoreapp1.1\TodoAPI.pdb
+D:\VScode\TodoAPI\obj\Release\netcoreapp1.1\TodoAPI.AssemblyInfo.cs
+D:\VScode\TodoAPI\obj\Release\netcoreapp1.1\TodoAPI.dll
+D:\VScode\TodoAPI\obj\Release\netcoreapp1.1\TodoAPI.pdb
