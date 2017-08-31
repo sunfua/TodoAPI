@@ -15,7 +15,7 @@ namespace TodoAPI.Models
         public string ObjectType { get; set; }
         public string Description { get; set; }
         public string Link { get; set; }
-        public bool Enable { get; set; }
+        public bool? Enable { get; set; }
 
         public virtual ICollection<RoleObject> RoleObject { get; set; }
     }

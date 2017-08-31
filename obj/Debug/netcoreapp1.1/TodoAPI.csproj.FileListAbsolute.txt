@@ -14,3 +14,5 @@ D:\Angular2\TodoAPI\obj\Debug\netcoreapp1.1\TodoAPI.dll
 D:\Angular2\TodoAPI\obj\Debug\netcoreapp1.1\TodoAPI.pdb
 D:\Angular2\TodoAPI\bin\Debug\netcoreapp1.1\TodoAPI.dll
 D:\Angular2\TodoAPI\bin\Debug\netcoreapp1.1\TodoAPI.pdb
+D:\VScode\TodoAPI\obj\Debug\netcoreapp1.1\TodoAPI.csproj.CoreCompileInputs.cache
+D:\VScode\TodoAPI\obj\Debug\netcoreapp1.1\TodoAPI.AssemblyInfoInputs.cache

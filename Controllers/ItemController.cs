@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using TodoAPI.Models;
 using System;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using HtmlAgilityPack;
 using System.Net.Http;
@@ -42,22 +43,25 @@ namespace TodoAPI.Controllers
                itemData=null;
                 using (HttpResponseMessage response = client.GetAsync(string.Format(url,id)).Result)
                 {
+                    var bytes = response.Content.ReadAsByteArrayAsync().Result;                        
+                    var result1 = Encoding.UTF8.GetString(bytes);
                     using (HttpContent content = response.Content)
                     {
                         string result = content.ReadAsStringAsync().Result;
                         HtmlDocument document = new HtmlDocument();
-                        document.LoadHtml(result);
-                        var nodes = document.DocumentNode.SelectNodes("<tr id='MainContent_ctl00_tr_Status_Detail'>").ToString();
-                        //Some work with page....
-                        itemData=document.ToString();
+                        document.LoadHtml(result1);                        
+                        var nodes = document.DocumentNode.SelectNodes("//*[@id='MainContent_ctl00_tr_Status_Detail']");
+                        //Some work with page....                        
+                        //itemData=nodes.ToString();
+                        itemData=document.DocumentNode.SelectSingleNode("//*[@id='MainContent_ctl00_grvItemTrace']").InnerHtml;
                     }
-                }               
+                }         
             }
             if (itemData==null)
             {
                 return NotFound();
             }
-            return Ok(itemData);
+            return Ok(itemData);            
         }
 
         [HttpGet("GetHCC/{date:datetime}")]

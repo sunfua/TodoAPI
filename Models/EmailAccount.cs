@@ -13,8 +13,8 @@ namespace TodoAPI.Models
         public string To { get; set; }
         public string From { get; set; }
         public string Subject { get; set; }
-        public bool EnableSsl { get; set; }
+        public bool? EnableSsl { get; set; }
         public int? Port { get; set; }
-        public bool Enable { get; set; }
+        public bool? Enable { get; set; }
     }
 }
