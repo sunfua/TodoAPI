@@ -25,6 +25,17 @@ namespace TodoAPI.Controllers
         {
             return new ObjectResult(_context.Customer.Where(c=>c.Poscode.StartsWith("65")).Take(10));
         }
+        // GET: api/Customer/id
+        [Route("{id}")]
+        public IActionResult Get(string id)
+        {
+            var customer=_context.Customer.Where(c=>c.CustomerCode==id);
+            if (customer==null)
+            {
+                return NotFound();
+            }
+            return new ObjectResult(customer);
+        }
         // GET: api/Customer/pageSize/pageNumber/orderBy(optional) 
         [Route("{pageSize:int}/{pageNumber:int}/{orderBy:alpha?}")]
         public async Task<IActionResult> Get(int pageSize, int pageNumber, string orderBy="")
