@@ -82,6 +82,7 @@ namespace TodoAPI.Controllers
         public IActionResult GetHCCFromSource(DateTime date)
         {           
             //return new ObjectResult(new DateTime[] {from, from.AddDays(1)});
+                       
             var datelm= date.AddDays(1);
             var items = from i in _context.Item join t in _context.ItemType 
                             on i.ItemTypeCode equals t.ItemTypeCode where (t.Type==1 && i.SendingTime>=date && i.SendingTime<=datelm) select i;            

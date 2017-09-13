@@ -17,13 +17,14 @@ namespace TodoAPI.Controllers
 
         public CustomerController(BCCPContext context)
         {
-            this._context=context;
+            this._context=context;    
+             //var _contextBC = DbContextFactory.Create("DB1");        
         }
 
         [HttpGet]
         public IActionResult GetAll()
         {
-            return new ObjectResult(_context.Customer.Where(c=>c.Poscode.StartsWith("65")).Take(10));
+            return new ObjectResult(_context.Customer.Where(c=>c.Poscode.StartsWith("65")).OrderBy(i=>i.CustomerCode).Take(10));
         }
         // GET: api/Customer/id
         [Route("{id}")]
