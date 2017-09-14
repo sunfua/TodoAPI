@@ -42,7 +42,10 @@ namespace TodoAPI
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-
+            Dictionary<string, string> connStrs = new Dictionary<string, string>();
+            connStrs.Add("DB1", Configuration.GetConnectionString("650000"));
+            connStrs.Add("DB2", Configuration.GetConnectionString("652090"));
+            DbContextFactory.SetConnectionString(connStrs);
             app.UseMvc();
         }
     }

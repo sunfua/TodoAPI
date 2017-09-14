@@ -27,3 +27,18 @@ public static class DbContextFactory
         }
     }
 }
+
+// Intialize DbContext factory
+
+// In startup.cs
+
+// public void Configure()
+// {
+//   Dictionary<string, string> connStrs = new Dictionary<string, string>();
+//   connStrs.Add("DB1", Configuration["Data:DB1Connection:ConnectionString"]);
+//   connStrs.Add("DB2", Configuration["Data:DB2Connection:ConnectionString"]);
+//   DbContextFactory.SetConnectionString(connStrs);
+// }
+// Usage
+
+// var dbContext= DbContextFactory.Create("DB1");

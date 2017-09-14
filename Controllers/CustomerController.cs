@@ -17,8 +17,8 @@ namespace TodoAPI.Controllers
 
         public CustomerController(BCCPContext context)
         {
-            this._context=context;    
-             //var _contextBC = DbContextFactory.Create("DB1");        
+            //this._context=context;    
+             this._context = DbContextFactory.Create("DB1");        
         }
 
         [HttpGet]
