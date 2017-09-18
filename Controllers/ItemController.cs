@@ -13,7 +13,7 @@ namespace TodoAPI.Controllers
     public class ItemController : Controller
     {        
         private readonly BCCPContext _context;
-        private BCCPContext context;
+        //private BCCPContext context;
         private string url="http://bccp.vnpost.vn/BCCP.aspx?act=Trace&id={0}&pkey=teWeIFQM";
         public ItemController(BCCPContext context)
         {
@@ -63,15 +63,35 @@ namespace TodoAPI.Controllers
             }
             return Ok(itemData);            
         }
-
-        [HttpGet("GetHCC/{date:datetime}")]
-        public IActionResult GetHCC(DateTime date)
-        {           
-            //return new ObjectResult(new DateTime[] {from, from.AddDays(1)});
-            var datelm= date.AddDays(1);
-            //var item = from i in _context.Item join t in _context.ItemType 
-            //                on i.ItemTypeCode equals t.ItemTypeCode where (t.Type==1 && i.SendingTime>=date && i.SendingTime<=datelm) select i;            
-            var items=_context.Item.Where(a=>a.SendingTime>=date && a.SendingTime<=datelm);
+        // GET: api/Item/isDomestic/AcceptancePOSCode/SendingTime(option)
+        [Route("{isDomestic:int}/{AcceptancePOSCode:length(6)}/{SendingTime:datetime?}")]
+        [HttpGet("GetItemList/{isDomestic:int}/{AcceptancePOSCode:length(6)}/{SendingTime:datetime?}")]
+        public IActionResult GetItemList(int isDomestic, string AcceptancePOSCode, DateTime? SendingTime)
+        {
+            var _contextPO = DbContextFactory.Create(AcceptancePOSCode);
+            if(SendingTime==null){
+                SendingTime=DateTime.Now.Date;
+                //Console.WriteLine("Ngay hien tai: "+SendingTime+" Ngày +1: "+SendingTime.Value.AddDays(1));
+            }
+            var items = _contextPO.Item.Where(a=>a.IsDomestic==(isDomestic==1) && a.AcceptancePoscode==AcceptancePOSCode && a.SendingTime>=SendingTime);
+            if (items==null)
+            {
+                return NotFound();
+            }
+            return new ObjectResult(items);
+        }
+        // GET: api/Item/AcceptancePOSCode/SendingTime(option)
+        [Route("{AcceptancePOSCode:length(6)}/{SendingTime:datetime?}")]
+        [HttpGet("GetHCC/{AcceptancePOSCode:length(6)}/{SendingTime:datetime?}")]
+        public IActionResult GetHCC(string AcceptancePOSCode, DateTime? SendingTime)
+        {             
+             var _contextPO = DbContextFactory.Create(AcceptancePOSCode);          
+            if(SendingTime==null){
+                SendingTime=DateTime.Now.Date;                
+            }
+            var items = from i in _contextPO.Item join t in _contextPO.ItemType 
+                            on i.ItemTypeCode equals t.ItemTypeCode where (t.Type==1 && i.SendingTime>=SendingTime) select i;            
+            
             if (items==null)
             {
                 return NotFound();
