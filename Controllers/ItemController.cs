@@ -65,8 +65,8 @@ namespace TodoAPI.Controllers
         }
         // GET: api/Item/isDomestic/AcceptancePOSCode/SendingTime(option)
         [Route("{isDomestic:int}/{AcceptancePOSCode:length(6)}/{SendingTime:datetime?}")]
-        [HttpGet("GetItemList/{isDomestic:int}/{AcceptancePOSCode:length(6)}/{SendingTime:datetime?}")]
-        public IActionResult GetItemList(int isDomestic, string AcceptancePOSCode, DateTime? SendingTime)
+        [HttpGet("GetItems/{isDomestic:int}/{AcceptancePOSCode:length(6)}/{SendingTime:datetime?}")]
+        public IActionResult GetItems(int isDomestic, string AcceptancePOSCode, DateTime? SendingTime)
         {
             var _contextPO = DbContextFactory.Create(AcceptancePOSCode);
             if(SendingTime==null){
@@ -74,6 +74,47 @@ namespace TodoAPI.Controllers
                 //Console.WriteLine("Ngay hien tai: "+SendingTime+" Ngày +1: "+SendingTime.Value.AddDays(1));
             }
             var items = _contextPO.Item.Where(a=>a.IsDomestic==(isDomestic==1) && a.AcceptancePoscode==AcceptancePOSCode && a.SendingTime>=SendingTime);
+            if (items==null)
+            {
+                return NotFound();
+            }
+            return new ObjectResult(items);
+        }
+
+        // GET: api/Item/itemType/AcceptancePOSCode/SendingTime(option)
+        [Route("{itemType:alpha}/{AcceptancePOSCode:length(6)}/{SendingTime:datetime?}")]
+        [HttpGet("GetItemList/{itemType:alpha}/{AcceptancePOSCode:length(6)}/{SendingTime:datetime?}")]
+        public IActionResult GetItemList(string itemType, string AcceptancePOSCode, DateTime? SendingTime)
+        {
+            var _contextPO = DbContextFactory.Create(AcceptancePOSCode);
+            IQueryable<Item> items=null;
+            if(SendingTime==null){
+                SendingTime=DateTime.Now.Date;
+                //Console.WriteLine("Ngay hien tai: "+SendingTime+" Ngày +1: "+SendingTime.Value.AddDays(1));
+            }
+            Enums.ItemType _itemType =Enums.ItemType.None;
+            try 
+            {
+                _itemType = Enum.Parse<Enums.ItemType>(itemType.ToUpper());
+            }
+            catch (Exception ex){ ex.Data.Clear();}
+            switch (_itemType) 
+            {
+                case Enums.ItemType.DOMESTIC:
+                    items = _contextPO.Item.Where(a=>a.IsDomestic==true && a.AcceptancePoscode==AcceptancePOSCode && a.SendingTime>=SendingTime);
+                    break;
+                case Enums.ItemType.FOREIGN:
+                    items = _contextPO.Item.Where(a=>a.IsDomestic==false && a.AcceptancePoscode==AcceptancePOSCode && a.SendingTime>=SendingTime);
+                    break;
+                case Enums.ItemType.HCC:
+                    items = from i in _contextPO.Item join t in _contextPO.ItemType 
+                            on i.ItemTypeCode equals t.ItemTypeCode where (t.Type==1 && i.SendingTime>=SendingTime) select i;  
+                    break;
+                case Enums.ItemType.ALL:
+                    items = _contextPO.Item.Where(a=>a.AcceptancePoscode==AcceptancePOSCode && a.SendingTime>=SendingTime);
+                    break;
+                case Enums.ItemType.None: break;                
+            }            
             if (items==null)
             {
                 return NotFound();

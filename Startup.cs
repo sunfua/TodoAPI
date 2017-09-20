@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TodoAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Routing;
 
 namespace TodoAPI
 {
@@ -35,6 +36,10 @@ namespace TodoAPI
             services.AddScoped<ITodoRepository, TodoRepository>();
             var connection=Configuration.GetConnectionString("BCCPDBase");// @"Server=10.57.128.14;Database=BCCP.650100;User Id=bccp;Password=123456";
             services.AddDbContext<BCCPContext>(opt=>opt.UseSqlServer(connection));
+            // services.Configure<RouteOptions>(routeOptions=>
+            // { dang bị loi
+            //     routeOptions.ConstraintMap.Add("itemtype",typeof(Enum.ItemType));                
+            // });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
