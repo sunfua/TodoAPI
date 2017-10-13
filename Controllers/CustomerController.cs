@@ -6,48 +6,103 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Http;
 using System.Threading.Tasks;
+using TodoAPI.Repository;
+using Microsoft.Extensions.Logging;
+using TodoAPI.Util;
+using System.Collections.Generic;
 
 namespace TodoAPI.Controllers
 {
     [Route("api/[controller]")]  
     public class CustomerController : Controller
     {        
-        private readonly BCCPContext _context;
-        //private BCCPContext context;
+        ICustomersRepository _CustomersRepository;
+        ILogger _Logger;
 
-        public CustomerController(BCCPContext context)
+        public CustomerController(ICustomersRepository customersRepo, ILoggerFactory loggerFactory)
         {
-            this._context=context;    
-            //this._context = DbContextFactory.Create("DB1");        
+            this._CustomersRepository=customersRepo;    
+            this._Logger=loggerFactory.CreateLogger(nameof(CustomerController));    
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        [NoCache]
+        public async Task<ActionResult> Customers()
         {
-            return new ObjectResult(_context.Customer.Where(c=>c.Poscode.StartsWith("65")).OrderBy(i=>i.CustomerCode).Take(10));
-        }
-        // GET: api/Customer/id
-        [Route("{id}")]
-        public IActionResult Get(string id)
-        {
-            var customer=_context.Customer.Where(c=>c.CustomerCode==id);
-            if (customer==null)
+            try
             {
-                return NotFound();
+                var customers = await _CustomersRepository.GetCustomersAsync();
+                return Ok(customers);
             }
-            return new ObjectResult(customer);
+            catch (Exception exp)
+            {
+                _Logger.LogError(exp.Message);
+                return BadRequest(); // BadRequest(new ApiResponse { Status = false });
+            }
         }
-        // GET: api/Customer/pageSize/pageNumber/orderBy(optional) 
-        [Route("{pageSize:int}/{pageNumber:int}/{orderBy:alpha?}")]
-        public async Task<IActionResult> Get(int pageSize, int pageNumber, string orderBy="")
+         // GET: api/Customer/page/skip/take/orderBy(optional) 
+        [Route("page/{skip:int}/{take:int}/{orderBy:alpha?}")]
+        [NoCache]
+        [ProducesResponseType(typeof(List<Customer>), 200)]
+        // [ProducesResponseType(typeof(ApiResponse), 400)]
+        public async Task<ActionResult> CustomersPage(int skip, int take)
         {
-            var totalCount =_context.Customer.Count();
-            var totalPage = Math.Ceiling((double)totalCount/pageSize);
-            var sql="SELECT * FROM (SELECT Row_Number() OVER(ORDER BY CustomerCode) As RowID, * FROM Customer WHERE POSCode like '65%') As RowResults "+
-                    "WHERE RowID Between {0} AND {1}";            
-            var customer = await _context.Customer.FromSql(sql,(pageNumber-1)*pageSize + 1, pageNumber*pageSize).ToArrayAsync();
-            //var customer = await _context.Customer.Where(c=>c.Poscode.StartsWith("65")).OrderBy(c=>c.CustomerCode).Skip((pageNumber-1)*pageSize).Take(pageSize).ToListAsync();
-            return new ObjectResult(customer);
+            try
+            {
+                var pagingResult = await _CustomersRepository.GetCustomersPageAsync(skip, take);
+                Response.Headers.Add("X-InlineCount", pagingResult.TotalRecords.ToString());
+                return Ok(pagingResult.Records);
+            }
+            catch (Exception exp)
+            {
+                _Logger.LogError(exp.Message);
+                return BadRequest(); //(new ApiResponse { Status = false });
+            }
         }
+        // GET api/customers/5
+        [HttpGet("{id}", Name = "GetCustomerRoute")]
+        [NoCache]
+        [ProducesResponseType(typeof(Customer), 200)]
+//        [ProducesResponseType(typeof(ApiResponse), 400)]
+        public async Task<ActionResult> Customers(string id)
+        {
+            try
+            {
+                var customer = await _CustomersRepository.GetCustomerAsync(id);
+                return Ok(customer);
+            }
+            catch (Exception exp)
+            {
+                _Logger.LogError(exp.Message);
+                return BadRequest(); //(new ApiResponse { Status = false });
+            }
+        }
+        // POST api/customers
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        // [ProducesResponseType(typeof(ApiResponse), 201)]
+        // [ProducesResponseType(typeof(ApiResponse), 400)]
+        public async Task<ActionResult> CreateCustomer([FromBody]Customer customer)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();//(new ApiResponse { Status = false, ModelState = ModelState });
+            }
+
+            try
+            {
+                var newCustomer = await _CustomersRepository.InsertCustomerAsync(customer);
+                if (newCustomer == null)
+                {
+                    return BadRequest();//(new ApiResponse { Status = false });
+                }
+                return CreatedAtRoute("GetCustomerRoute", new { id = newCustomer.CustomerCode }, newCustomer);//, new ApiResponse { Status = true, Customer = newCustomer });
+            }
+            catch (Exception exp)
+            {
+                _Logger.LogError(exp.Message);
+                return BadRequest();//(new ApiResponse { Status = false });
+            }
+        }        
     }
 }

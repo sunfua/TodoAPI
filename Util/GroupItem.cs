@@ -1,6 +1,6 @@
 namespace TodoAPI.Enums
 {
-    public enum ItemType 
+    public enum GroupItem
     {
         None=0,
         ALL=1,

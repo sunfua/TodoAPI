@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using TodoAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Routing;
+using TodoAPI.Repository;
 
 namespace TodoAPI
 {
@@ -33,9 +34,11 @@ namespace TodoAPI
             // Add framework services.
             services.AddDbContext<TodoContext>(opt=>opt.UseInMemoryDatabase());            
             services.AddMvc();
-            services.AddScoped<ITodoRepository, TodoRepository>();
+            services.AddScoped<ITodoRepository, TodoRepository>();            
             var connection=Configuration.GetConnectionString("BCCPDBase");// @"Server=10.57.128.14;Database=BCCP.650100;User Id=bccp;Password=123456";
             services.AddDbContext<BCCPContext>(opt=>opt.UseSqlServer(connection));
+            services.AddScoped<ICustomersRepository,CustomersRepository>();
+            services.AddScoped<IItemsRepository,ItemsRepository>();
             // services.Configure<RouteOptions>(routeOptions=>
             // { dang bị loi
             //     routeOptions.ConstraintMap.Add("itemtype",typeof(Enum.ItemType));                

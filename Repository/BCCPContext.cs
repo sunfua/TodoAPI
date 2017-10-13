@@ -1,8 +1,8 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using TodoAPI.Models;
 
-namespace TodoAPI.Models
+namespace TodoAPI.Repository
 {
     public partial class BCCPContext : DbContext
     {
